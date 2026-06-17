@@ -18,7 +18,13 @@ def reset_activities():
 
 
 def test_get_activities():
-    resp = client.get("/activities")
+    # Arrange
+    url = "/activities"
+
+    # Act
+    resp = client.get(url)
+
+    # Assert
     assert resp.status_code == 200
     data = resp.json()
     assert isinstance(data, dict)
@@ -26,30 +32,54 @@ def test_get_activities():
 
 
 def test_signup_success():
+    # Arrange
     activity = "Chess Club"
     email = "newstudent@example.com"
-    resp = client.post(f"/activities/{activity}/signup", params={"email": email})
+    url = f"/activities/{activity}/signup"
+
+    # Act
+    resp = client.post(url, params={"email": email})
+
+    # Assert
     assert resp.status_code == 200
     assert email in app_module.activities[activity]["participants"]
 
 
 def test_signup_already_signed_up():
+    # Arrange
     activity = "Chess Club"
     email = "already@mergington.edu"
-    resp1 = client.post(f"/activities/{activity}/signup", params={"email": email})
+    url = f"/activities/{activity}/signup"
+
+    # Act
+    resp1 = client.post(url, params={"email": email})
+    resp2 = client.post(url, params={"email": email})
+
+    # Assert
     assert resp1.status_code == 200
-    resp2 = client.post(f"/activities/{activity}/signup", params={"email": email})
     assert resp2.status_code == 400
 
 
 def test_unregister_success():
+    # Arrange
     activity = "Programming Class"
     existing = app_module.activities[activity]["participants"][0]
-    resp = client.delete(f"/activities/{activity}/signup", params={"email": existing})
+    url = f"/activities/{activity}/signup"
+
+    # Act
+    resp = client.delete(url, params={"email": existing})
+
+    # Assert
     assert resp.status_code == 200
     assert existing not in app_module.activities[activity]["participants"]
 
 
 def test_activity_not_found():
-    resp = client.post("/activities/NoSuchActivity/signup", params={"email": "a@b.com"})
+    # Arrange
+    url = "/activities/NoSuchActivity/signup"
+
+    # Act
+    resp = client.post(url, params={"email": "a@b.com"})
+
+    # Assert
     assert resp.status_code == 404
